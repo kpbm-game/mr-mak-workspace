@@ -43,6 +43,10 @@ the provider and a descriptive English title. Start with a task such as
 `Dream Game Plan`. Choose the repository as the working folder. The normal CLI
 permission flow is enabled by default; bypass is a deliberate per-chat choice.
 
+New Codex and Claude chats default to `xhigh` reasoning effort. Saved effort
+choices stay with existing chats. Web links in terminal output open in your
+default browser with a click.
+
 Try: “Read the My Dream Game example and turn it into a small project plan for
 my game. Ask me for the missing game idea before replacing the example.”
 
@@ -67,7 +71,8 @@ coordinator. Its model follows your account configuration; an optional
 
 Voice requests can focus a chat, inspect a report, update a card or hand a larger
 task to a worker. Direct actions stay quick; a visible worker handles deliverables.
-Medium is the minimum default effort; difficult work can use high or xhigh.
+Task-specific voice requests can use medium, high or xhigh effort. A direct
+request to open a new chat uses the same `xhigh` default as the **+** button.
 Max requires an explicit request. The app reports tool results before calling
 an action complete.
 

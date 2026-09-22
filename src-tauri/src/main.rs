@@ -3,6 +3,7 @@
 use std::{fs, io::{BufRead, BufReader, Write}, path::PathBuf, process::{Child, Command, Stdio}, sync::Mutex};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem}, tray::{TrayIconBuilder, TrayIconEvent, MouseButton, MouseButtonState}};
 use tauri_plugin_window_state::StateFlags;
+mod external_links;
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
 #[cfg(windows)]
@@ -136,11 +137,13 @@ fn make_windows(app: &tauri::AppHandle, workspace: &str, chats: &str) -> Result<
     }
     let chat_width = (width * 0.27).clamp(360.0, 560.0);
     let workspace_window = WebviewWindowBuilder::new(app, "workspace", WebviewUrl::External(workspace.parse()?))
+        .on_new_window(|url, _| external_links::open_popup(url))
         .disable_drag_drop_handler().visible(false)
         .title(format!("{} — Workspace", app.config().product_name.as_deref().unwrap_or("Mr. Mak"))).inner_size((width - chat_width - 8.0).max(500.0), (height - 6.0).max(450.0))
         .position(x + chat_width + 6.0, y + 2.0).min_inner_size(500.0, 400.0)
         .theme(Some(tauri::Theme::Dark)).background_color(tauri::webview::Color(12, 13, 16, 255)).build()?;
     let chats_window = WebviewWindowBuilder::new(app, "chats", WebviewUrl::External(chats.parse()?))
+        .on_new_window(|url, _| external_links::open_popup(url))
         .visible(false)
         .title(format!("{} — Chats", app.config().product_name.as_deref().unwrap_or("Mr. Mak"))).inner_size(chat_width, (height - 6.0).max(450.0))
         .position(x + 2.0, y + 2.0).min_inner_size(330.0, 420.0)

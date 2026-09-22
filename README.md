@@ -65,6 +65,10 @@ your own agent accounts and any services you want to use.
 The installer includes the local Node service. It does not include Codex,
 Claude Code, Kimi, Blender, Python or provider accounts.
 
+**Already using Mr. Mak?** Read the [0.1.1 update notes](CHANGELOG.md) for browser
+links, the terminal layout fix and the new chat effort default. Install the update
+after quitting the app from its tray menu, then open your existing repository.
+
 To build from source, install Node.js 22.20+ and the Windows Tauri build
 prerequisites, then run:
 
@@ -94,6 +98,8 @@ them, or archive all four when you are ready.
 
 Terminal text settings let you adjust readability. In agent chats, Ctrl+C copies
 selected text; PowerShell keeps normal shell behavior.
+Click web links in chats or cards to open your default browser. New Codex and
+Claude chats start with `xhigh` effort; saved effort choices are preserved.
 
 ## Skills you can keep
 

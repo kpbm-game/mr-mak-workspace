@@ -89,6 +89,32 @@ try {
   await page.getByText('No MCP servers match these filters.', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Close MCP', exact: true }).click();
   await page.goto(service.urls.chats);
+  async function setTerminalFontSize(size) {
+    await page.getByTitle('Chat options', { exact: true }).click();
+    const control = page.locator('.font-control');
+    const current = Number(await control.locator('span').last().innerText());
+    const button = control.getByRole('button', { name: size > current ? '+' : '−', exact: true });
+    for (let count = 0; count < Math.abs(size - current); count++) await button.click();
+    await page.getByTitle('Chat options', { exact: true }).click();
+  }
+  // Check the actual terminal rows, not just the host box: FitAddon can size
+  // a grid into parent padding and silently clip the CLI's bottom status row.
+  for (const [width, height, fontSize] of [[535, 720, 13], [535, 497, 17], [900, 800, 13], [640, 480, 22]]) {
+    await page.setViewportSize({ width, height });
+    await setTerminalFontSize(fontSize);
+    await page.waitForFunction(size => {
+      const rows = document.querySelector('.xterm-rows');
+      return rows && getComputedStyle(rows).fontSize === `${size}px`;
+    }, fontSize);
+    await page.waitForFunction(() => {
+      const last = document.querySelector('.xterm-rows > :last-child')?.getBoundingClientRect();
+      const host = document.querySelector('.terminal-host')?.getBoundingClientRect();
+      const status = document.querySelector('.chat-status')?.getBoundingClientRect();
+      return last && host && status && last.bottom <= host.bottom + .5 && last.bottom <= status.top - 4 && last.right <= host.right + .5;
+    }, null, { timeout: 3000 });
+  }
+  await page.setViewportSize({ width: 900, height: 800 });
+  await setTerminalFontSize(13);
   for (const agent of ['codex', 'claude', 'kimi', 'shell']) {
     await page.locator(`[data-chat-tab="${agent}"] [role="tab"]`).click();
     const screen = page.locator('.terminal-area .xterm-screen'); await screen.waitFor();
@@ -112,7 +138,7 @@ try {
     }
   }
   assert.deepEqual(errors, []);
-  console.log('UI passed: 12 clickable wrapping tabs; Markdown preview/edit/save/conflict/draft; local Skills; MCP filtering, checks and hidden credentials; Codex/Claude/Kimi copy and scroll; PowerShell interrupt.');
+  console.log('UI passed: 12 clickable wrapping tabs; Markdown preview/edit/save/conflict/draft; local Skills; MCP filtering, checks and hidden credentials; terminal bottom row visible across four window/font sizes; Codex/Claude/Kimi copy and scroll; PowerShell interrupt.');
 } finally {
   await browser?.close();
   for (const session of service.sessions.items.values()) session.process = null;

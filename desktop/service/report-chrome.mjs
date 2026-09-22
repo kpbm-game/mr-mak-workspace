@@ -2,14 +2,27 @@ import {createReadStream} from 'node:fs';
 import {Transform} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
 
-// Only browser chrome and fallback canvas colours. Document layouts, artwork,
+// Shared browser chrome and external-link routing. Document layouts, artwork,
 // scripts and explicitly styled body colours remain owned by the report.
 const prelude = Buffer.from(`<meta name="color-scheme" content="dark"><style data-mrmak-chrome>
 html{color-scheme:dark;background-color:#101115;color:#d3d0d9}
 html,body,body *{scrollbar-color:#514c59 #111217!important;scrollbar-width:thin}
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:#111217!important}
 ::-webkit-scrollbar-thumb{background:#514c59!important;border:2px solid #111217;border-radius:6px}
-</style>`);
+</style><script data-mrmak-links>
+(() => {
+  const route = event => {
+    const link = event.target.closest?.('a[href]');
+    if (!link || link.hasAttribute('download') || event.defaultPrevented) return;
+    const url = new URL(link.href, location.href);
+    if (!['http:', 'https:'].includes(url.protocol) || url.origin === location.origin) return;
+    link.target = '_blank';
+    link.relList.add('noopener', 'noreferrer');
+  };
+  document.addEventListener('click', route, true);
+  document.addEventListener('auxclick', route, true);
+})();
+</script>`);
 
 export function reportChromeStream() {
   let pending = Buffer.alloc(0), inserted = false;

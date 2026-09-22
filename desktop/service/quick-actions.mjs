@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readJson, saveJson, publicError } from './util.mjs';
 import { localDay } from './workspace.mjs';
 import { taskTitle } from './titles.mjs';
+import { defaultWorkerEffort } from './effort.mjs';
 
 const normalize = text => String(text || '').toLowerCase().replace(/ё/g, 'е').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 const polite = text => String(text || '').trim().replace(/^(?:(?:ну|так|слушай|давай|пожалуйста|please|can you)[,\s]+)+/iu, '').replace(/[,\s]+пожалуйста[.!?]?$/iu, '').replace(/[.!?]+$/, '').trim();
@@ -92,7 +93,7 @@ export class QuickActions {
     if (match) {
       let name; try { name = taskTitle(match[2]); } catch { return null; }
       const agent = /claude|клод/iu.test(match[1] || '') ? 'claude' : /kimi/iu.test(match[1] || '') ? 'kimi' : 'codex';
-      return async () => { const chat = await call('open_chat', { agent, name, effort: 'medium' }); return `Created "${chat.name}". The agent is starting.`; };
+      return async () => { const chat = await call('open_chat', { agent, name, effort: defaultWorkerEffort }); return `Created "${chat.name}". The agent is starting.`; };
     }
     return null;
   }

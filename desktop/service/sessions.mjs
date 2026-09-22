@@ -10,7 +10,7 @@ import { terminalCommand, childEnvironment } from './agents.mjs';
 import { readJson, saveJson } from './util.mjs';
 import { claudeTranscript, codexTranscript, tailNativeFile } from './native-events.mjs';
 import { englishTitle, restoredTitle } from './titles.mjs';
-import { workerEfforts } from './effort.mjs';
+import { defaultWorkerEffort, workerEfforts } from './effort.mjs';
 
 const { Terminal } = headless;
 const { SerializeAddon } = serialize;
@@ -44,7 +44,7 @@ export class Sessions extends EventEmitter {
   }
 
   make(metadata) {
-    return { activity: 'idle', unread: false, completionVersion: 0, tabOrder: this.items.size, tabColor: null, ...metadata, terminal: null, serializer: null, process: null, sequence: 0, pendingOutput: '', outputTimer: null };
+    return { activity: 'idle', unread: false, completionVersion: 0, tabOrder: this.items.size, tabColor: null, ...metadata, effort: ['codex', 'claude'].includes(metadata.agent) ? metadata.effort || defaultWorkerEffort : undefined, terminal: null, serializer: null, process: null, sequence: 0, pendingOutput: '', outputTimer: null };
   }
 
   async hydrate(session) {
@@ -94,7 +94,7 @@ export class Sessions extends EventEmitter {
       id: randomUUID(), agent, name: englishTitle(options.name, `Conversation ${this.items.size + 1}`),
       tabOrder: Math.max(-1, ...this.list().map(item => item.tabOrder)) + 1,
       cwd, bypass: options.bypass === true, createdAt: now, lastInputAt: null, lastOutputAt: null,
-      effort: ['codex', 'claude'].includes(agent) ? options.effort || 'medium' : undefined,
+      effort: options.effort,
       status: 'starting', nativeId: options.resumeId || (agent === 'claude' ? randomUUID() : null),
       open: true, pinned: false, updatedAt: now, preview: '', hasConversation: !!options.resumeId, restoreError: null,
       attention: false, cols: Math.min(500, Math.max(20, options.cols || 90)), rows: Math.min(200, Math.max(5, options.rows || 32)),

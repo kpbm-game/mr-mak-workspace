@@ -19,7 +19,11 @@ const run = (args, cwd) => { const result = spawnSync(process.execPath, [npm, ..
 run(['run', 'build'], repo);
 await cp(process.execPath, path.join(runtime, 'node.exe'));
 await mkdir(path.join(runtime, 'service'), { recursive: true });
-await cp(path.join(repo, 'desktop', 'service'), path.join(runtime, 'service'), { recursive: true, filter: source => !source.split(path.sep).some(part => ['node_modules', 'test', '.cache'].includes(part)) });
+const serviceSource = path.join(repo, 'desktop', 'service');
+await cp(serviceSource, path.join(runtime, 'service'), { recursive: true, filter: source => !path.relative(serviceSource, source).split(path.sep).some(part => ['node_modules', 'test', '.cache'].includes(part)) });
+// A checkout can itself live under a cache/worktree directory. Validate the
+// payload before npm can resolve an unrelated parent package.json.
+for (const file of ['package.json', 'package-lock.json', 'main.mjs', 'server.mjs']) await access(path.join(runtime, 'service', file));
 run(['ci', '--omit=dev'], path.join(runtime, 'service'));
 await cp(path.join(repo, 'dist'), path.join(runtime, 'ui'), { recursive: true });
 // Vite deliberately does not copy the enormous workspace junction. Bundle only UI assets.
