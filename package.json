@@ -1,7 +1,7 @@
 {
   "name": "mr-mak-workspace",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "predev": "node scripts/ensure-workspace-link.mjs",
@@ -14,7 +14,7 @@
     "desktop:build": "tauri build",
     "desktop:dev": "tauri dev",
     "desktop:test": "node --test desktop/service/test/*.test.mjs",
-    "desktop:test:ui": "node desktop/service/test/ui.mjs && node desktop/service/test/links-ui.mjs",
+    "desktop:test:ui": "node desktop/service/test/ui.mjs && node desktop/service/test/links-ui.mjs && node desktop/service/test/scroll-ui.mjs",
     "test": "npm run desktop:test",
     "test:template": "node scripts/check-template.mjs && node scripts/sync-skills.mjs --check",
     "skills:sync": "node scripts/sync-skills.mjs"

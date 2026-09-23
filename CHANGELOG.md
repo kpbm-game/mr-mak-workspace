@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 - 2026-09-23
+
+- Fixed mouse-wheel scrolling in fullscreen Claude Code chats after opening a tab or returning to it. Scrolling also survives reconnects.
+- Terminal snapshots and saved screens now preserve the mouse protocol requested by the CLI. Codex and classic Claude keep their existing scrollback behavior.
+
+**Update:** finish active tasks, quit Mr. Mak Workspace from its tray menu, then run the new Windows installer. Open your existing repository; project files, settings and chat history stay in place.
+
 ## 0.1.1 - 2026-09-22
 
 - Web links in agent chats and Workspace cards now open in your default browser. Wrapped terminal links and named citations work too.

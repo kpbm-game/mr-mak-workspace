@@ -33,6 +33,11 @@ preserved. Terminal URLs and OSC 8 links use xterm link handlers. New-window
 requests from both app windows open HTTP(S) links through the Windows default
 browser association, while the current app view stays open.
 
+Fullscreen Claude scrolls its own conversation. Terminal snapshots preserve
+both mouse tracking and the requested SGR encoding, including saved screens,
+so switching tabs or reconnecting does not disable its mouse wheel. Classic
+Claude and Codex continue using local terminal scrollback.
+
 ## Checks
 
 ```powershell

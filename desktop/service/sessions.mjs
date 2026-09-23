@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import pty from 'node-pty';
 import headless from '@xterm/headless';
-import serialize from '@xterm/addon-serialize';
+import { TerminalSnapshotAddon } from './terminal-snapshot.mjs';
 import { terminalCommand, childEnvironment } from './agents.mjs';
 import { readJson, saveJson } from './util.mjs';
 import { claudeTranscript, codexTranscript, tailNativeFile } from './native-events.mjs';
@@ -13,7 +13,6 @@ import { englishTitle, restoredTitle } from './titles.mjs';
 import { defaultWorkerEffort, workerEfforts } from './effort.mjs';
 
 const { Terminal } = headless;
-const { SerializeAddon } = serialize;
 const publicSession = session => {
   const { id, name, agent, cwd, bypass, effort, status, createdAt, lastOutputAt, lastInputAt, exitCode, nativeId, attention, activity, unread, completionVersion, lastCompletedId, cols, rows, open, pinned, tabOrder, tabColor, updatedAt, preview, hasConversation, restoreError } = session;
   return { id, name, agent, cwd, bypass, effort, status, createdAt, lastOutputAt, lastInputAt, exitCode, nativeId, attention, activity, unread, completionVersion, lastCompletedId, cols, rows, open, pinned, tabOrder, tabColor, updatedAt, preview, hasConversation, restoreError };
@@ -52,7 +51,7 @@ export class Sessions extends EventEmitter {
     if (session.terminal) return;
     session.hydrating = (async () => {
       const terminal = new Terminal({ cols: session.cols || 90, rows: session.rows || 32, scrollback: 3000, allowProposedApi: true });
-      const serializer = new SerializeAddon();
+      const serializer = new TerminalSnapshotAddon();
       terminal.loadAddon(serializer);
       session.terminal = terminal; session.serializer = serializer;
       const screen = await readJson(path.join(this.stateDir, `screen-${session.id}.json`), null);
